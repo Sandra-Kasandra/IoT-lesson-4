@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IoT Dashboard</title>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script> <!--  Socket.IO: used for real-time -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- for drawing line charts -->
+   <!-- time adapter that allow time-based X axis on charts -->
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    canvas { max-width: 800px; margin-bottom: 40px; }
+  </style>
+
+</head>
+<body>
+  <h1>IoT Dashboard</h1>
+
+  <canvas id="tempChart"></canvas>
+  <canvas id="humChart"></canvas>
+
+  <script>
+    // connect to server
+    const socket = io("http://localhost:3000"); 
+
+    const tempCtx = document.getElementById('tempChart').getContext('2d');
+    const humCtx = document.getElementById('humChart').getContext('2d');
+    
+    // create line charts
+    const tempChart = new Chart(tempCtx, {
+      type: 'line',
+      data: { 
+        labels: [], 
+        datasets: [{ label: 'Temperature (°C)', data: [], borderColor: 'red', fill: false }] 
+        },
+      options: { 
+        responsive: true, 
+        scales: { x: { type: 'time', time: { unit: 'second' } }, y: { beginAtZero: true } } 
+        }
+    });
+
+    const humChart = new Chart(humCtx, {
+      type: 'line',
+      data: { 
+        labels: [], 
+        datasets: [{ label: 'Humidity (%)', data: [], borderColor: 'blue', fill: false }] 
+    },
+      options: { 
+        responsive: true, 
+        scales: { x: { type: 'time', time: { unit: 'second' } }, y: { beginAtZero: true } } 
+    }
+    });
+
+    // function to add data to charts
+    function addData(chart, label, value) {
+      chart.data.labels.push(label);
+      chart.data.datasets[0].data.push(value);
+      if (chart.data.labels.length > 20) { // keep last 20 points
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+      }
+      chart.update();
+    }
+
+    // handle data
+    socket.on("init-data", data => {
+      data.forEach(d => {
+        const time = new Date(d.timestamp);
+        addData(tempChart, time, d.temperature);
+        addData(humChart, time, d.humidity);
+      });
+    });
+
+    // handle new incoming data
+    socket.on("new-data", d => {
+      const time = new Date(d.timestamp);
+      addData(tempChart, time, d.temperature);
+      addData(humChart, time, d.humidity);
+    });
+  </script>
+</body>
+</html>
