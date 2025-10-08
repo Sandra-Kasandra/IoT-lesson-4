@@ -7,17 +7,19 @@ This project is using Raspberry Pi Pico W, ThingSpeak, Node.js, and a web dashbo
 - Sends data to ThingSpeak every 15 seconds
 - Node.js server fetches data from ThingSpeak every 20 seconds
 - Real-time dashboard using Chart.js and Socket.io
-- Keeps last 20 measurements in memory
+- Keeps lasts 20 measurements in memory
   
 ## How it works
 
 1. Pico W collects sensor data and posts to ThingSpeak.
 2. Node.js server fetches the latest data from ThingSpeak.
 3. Web dashboard displays real-time data using WebSockets.
+   <img width="675" height="581" alt="Screenshot 2025-10-08 053118" src="https://github.com/user-attachments/assets/49e9e424-442d-42a8-ba49-c747391f2554" />
+   <img width="648" height="499" alt="Screenshot 2025-10-08 053128" src="https://github.com/user-attachments/assets/29964f73-a86d-4702-8455-860b329ce4c1" />
 
 ## Setup
 ### ThingSpeak
-1. Create channel in ThingSpeak
+1. Create a channel in ThingSpeak
 2. Add two fields
 3. Save API Keys and channel ID
 4. Go to Apps -> ThingsHTTP -> create one
@@ -37,7 +39,6 @@ This project is using Raspberry Pi Pico W, ThingSpeak, Node.js, and a web dashbo
 3. Open the server.js file, find those strokes and write id channel and api read key:
     -> const CHANNEL_ID = 'YOUR-ID-CHANNEL';
     -> const READ_API_KEY = 'YOUR-READ-API-KEY';
-4. Start server with command:
+4. Start a server with the command:
     -> node server.js
-
-5. 3. Open `client.html` in a browser to view the dashboard.
+5. Open `client.html` in a browser to view the dashboard.
